@@ -1,0 +1,51 @@
+version: 2
+project_name: ctxguard
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: ctxguard
+    main: ./cmd/ctxguard
+    binary: ctxguard
+    env: [CGO_ENABLED=0]
+    goos: [darwin, linux, windows]
+    goarch: [amd64, arm64]
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.ShortCommit}} -X main.date={{.Date}}
+
+archives:
+  - formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_
+      {{- if eq .Os "darwin" }}macos{{- else }}{{ .Os }}{{ end }}_
+      {{- if eq .Arch "amd64" }}x86_64{{- else }}{{ .Arch }}{{ end }}
+    files: [README.md, LICENSE]
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  use: github
+  sort: asc
+  filters:
+    exclude: ['^docs:', '^test:', '^chore:']
+
+release:
+  footer: |
+    ## Install
+
+    ```sh
+    go install github.com/muthuishere/ctx-guard/cmd/ctxguard@latest
+    ```
+
+    Or download the archive for your platform below, then:
+
+    ```sh
+    tar xzf ctxguard_*.tar.gz && sudo mv ctxguard /usr/local/bin/
+    ctxguard install
+    ```

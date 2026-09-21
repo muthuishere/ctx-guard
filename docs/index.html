@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ctx-guard</title>
+<meta name="description" content="What your coding agent's context window is made of — and what it actually costs.">
+<style>
+:root{
+  --bg:#fcfcfa; --fg:#1a1a18; --muted:#6b6b63; --line:#e2e2dc;
+  --accent:#b4531f; --accent2:#2f6b57; --dim:#d8d8d0; --code:#f3f3ee;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#14140f; --fg:#eceae2; --muted:#98968c; --line:#2b2b24;
+    --accent:#e08a4e; --accent2:#67ad8f; --dim:#33332b; --code:#1c1c16;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14140f; --fg:#eceae2; --muted:#98968c; --line:#2b2b24;
+  --accent:#e08a4e; --accent2:#67ad8f; --dim:#33332b; --code:#1c1c16;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--fg);
+  font:16px/1.65 ui-sans-serif,-apple-system,"Segoe UI",Inter,system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:720px; margin:0 auto; padding:64px 16px 96px}
+h1{font-size:28px; letter-spacing:-.02em; margin:0 0 6px; font-weight:650}
+h2{font-size:15px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted);
+   font-weight:600; margin:56px 0 18px}
+p{margin:0 0 16px; color:var(--fg)}
+.lede{color:var(--muted); font-size:17px; margin-bottom:34px}
+code,pre,.mono{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace}
+pre{background:var(--code); border:1px solid var(--line); border-radius:8px;
+    padding:14px 16px; overflow-x:auto; font-size:13px; line-height:1.55; margin:0 0 18px}
+code{font-size:.9em; background:var(--code); padding:1px 5px; border-radius:4px}
+pre code{background:none; padding:0}
+a{color:var(--accent); text-decoration:none; border-bottom:1px solid transparent}
+a:hover{border-bottom-color:var(--accent)}
+table{width:100%; border-collapse:collapse; font-size:14px; margin:0 0 18px}
+th,td{text-align:left; padding:9px 10px 9px 0; border-bottom:1px solid var(--line); vertical-align:top}
+th{color:var(--muted); font-weight:600; font-size:12px; letter-spacing:.04em; text-transform:uppercase}
+td.n{font-family:ui-monospace,monospace; white-space:nowrap}
+.big{font-family:ui-monospace,monospace; font-size:26px; color:var(--accent); font-weight:600}
+figure{margin:0 0 22px}
+figcaption{font-size:13px; color:var(--muted); margin-top:8px}
+svg{display:block; width:100%; height:auto; overflow:visible}
+ul{padding-left:18px; margin:0 0 16px} li{margin-bottom:9px}
+.rule{height:1px; background:var(--line); border:0; margin:56px 0}
+footer{color:var(--muted); font-size:13px; margin-top:64px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>ctx-guard</h1>
+<p class="lede">What your coding agent's context window is made of — and what it actually costs.</p>
+
+<pre><code>ctx-guard  ctx 301K 30% 🟢
+
+context   301K  (30% of 1000K)
+model     claude-opus-5
+
+  system prompt    32.7K   harness
+  CLAUDE.md        10.5K   you
+  skill roster      8.7K   you
+  MCP tool names    1.5K   you
+  ─────────────────────────
+  recorded         56.2K
+  yours to trim    21.5K</code></pre>
+
+<h2>The thing nobody measures</h2>
+<p>Running a tool is free — it's your CPU. But its <em>output joins the conversation</em>,
+and the whole conversation is re-sent to the API on every subsequent turn.</p>
+
+<figure>
+<svg viewBox="0 0 640 150" role="img" aria-label="A 20k-token file read at turn 10 is re-sent on every turn after it, costing about 1M tokens.">
+  <line x1="30" y1="112" x2="620" y2="112" stroke="var(--line)" stroke-width="1"/>
+  <g font-family="ui-monospace,monospace" font-size="10" fill="var(--muted)">
+    <text x="30" y="132">turn 10</text><text x="592" y="132">60</text>
+  </g>
+  <rect x="30" y="34" width="13" height="70" rx="2" fill="var(--accent)"/>
+  <g fill="var(--accent)" opacity="0.26">
+    <rect x="53" y="34" width="13" height="70" rx="2"/><rect x="76" y="34" width="13" height="70" rx="2"/>
+    <rect x="99" y="34" width="13" height="70" rx="2"/><rect x="122" y="34" width="13" height="70" rx="2"/>
+    <rect x="145" y="34" width="13" height="70" rx="2"/><rect x="168" y="34" width="13" height="70" rx="2"/>
+    <rect x="191" y="34" width="13" height="70" rx="2"/><rect x="214" y="34" width="13" height="70" rx="2"/>
+    <rect x="237" y="34" width="13" height="70" rx="2"/><rect x="260" y="34" width="13" height="70" rx="2"/>
+    <rect x="283" y="34" width="13" height="70" rx="2"/><rect x="306" y="34" width="13" height="70" rx="2"/>
+    <rect x="329" y="34" width="13" height="70" rx="2"/><rect x="352" y="34" width="13" height="70" rx="2"/>
+    <rect x="375" y="34" width="13" height="70" rx="2"/><rect x="398" y="34" width="13" height="70" rx="2"/>
+    <rect x="421" y="34" width="13" height="70" rx="2"/><rect x="444" y="34" width="13" height="70" rx="2"/>
+    <rect x="467" y="34" width="13" height="70" rx="2"/><rect x="490" y="34" width="13" height="70" rx="2"/>
+    <rect x="513" y="34" width="13" height="70" rx="2"/><rect x="536" y="34" width="13" height="70" rx="2"/>
+    <rect x="559" y="34" width="13" height="70" rx="2"/><rect x="582" y="34" width="13" height="70" rx="2"/>
+  </g>
+  <g font-family="ui-monospace,monospace" font-size="11">
+    <text x="30" y="22" fill="var(--accent)">read 20k</text>
+    <text x="620" y="22" fill="var(--fg)" text-anchor="end">≈ 1M tokens</text>
+  </g>
+</svg>
+<figcaption>One 20k-token file read, in a 60-turn session. Paid once — then again, every turn after.</figcaption>
+</figure>
+
+<p>Across 1,295 local Claude Code transcripts over 101 days:</p>
+<table>
+  <tr><td>cache reads</td><td class="n"><strong>36.9B</strong> — 97.5% of all tokens</td></tr>
+  <tr><td>tool output that ever entered context</td><td class="n">27.8M</td></tr>
+  <tr><td>the multiplier</td><td class="n"><strong>≈1,300×</strong></td></tr>
+</table>
+<p>The bill is <code>context_length × turn_count</code>. Not ingestion.</p>
+
+<h2>Where it actually goes</h2>
+<figure>
+<svg viewBox="0 0 640 132" role="img" aria-label="Static startup prefix 7.45 billion tokens, all tool results 6.42 billion, of which images are 2.89 billion.">
+  <g font-family="ui-monospace,monospace" font-size="11">
+    <text x="0" y="16" fill="var(--muted)">static startup prefix</text>
+    <rect x="0" y="24" width="430" height="17" rx="3" fill="var(--accent)"/>
+    <text x="440" y="37" fill="var(--fg)">7.45B · 20%</text>
+
+    <text x="0" y="66" fill="var(--muted)">every tool result ever</text>
+    <rect x="0" y="74" width="371" height="17" rx="3" fill="var(--accent2)"/>
+    <text x="381" y="87" fill="var(--fg)">6.42B · 17%</text>
+
+    <rect x="0" y="99" width="167" height="12" rx="3" fill="var(--accent2)" opacity="0.45"/>
+    <text x="177" y="109" fill="var(--muted)">└ images &amp; PDFs — 2.89B, from 243 admissions</text>
+  </g>
+</svg>
+<figcaption>The preamble costs more than every tool result ever returned, combined.</figcaption>
+</figure>
+
+<p>And that preamble is the same <strong>~73k tokens in every session</strong> — of which
+about <strong>21k is yours to change</strong>:</p>
+
+<figure>
+<svg viewBox="0 0 640 96" role="img" aria-label="Of the 73k startup prefix: 46k harness tool schemas not in any transcript, 32.7k system prompt, 10.5k CLAUDE.md, 8.7k skill roster.">
+  <g font-family="ui-monospace,monospace" font-size="11">
+    <rect x="0"   y="8" width="252" height="22" rx="3" fill="var(--dim)"/>
+    <rect x="256" y="8" width="180" height="22" rx="3" fill="var(--dim)"/>
+    <rect x="440" y="8" width="104" height="22" rx="3" fill="var(--accent)"/>
+    <rect x="548" y="8" width="86"  height="22" rx="3" fill="var(--accent)" opacity="0.62"/>
+    <text x="0"   y="50" fill="var(--muted)">46k unmeasurable</text>
+    <text x="0"   y="65" fill="var(--muted)">tool schemas, MCP defs</text>
+    <text x="256" y="50" fill="var(--muted)">32.7k system</text>
+    <text x="440" y="50" fill="var(--accent)">10.5k</text>
+    <text x="440" y="65" fill="var(--accent)">CLAUDE.md</text>
+    <text x="548" y="50" fill="var(--accent)">8.7k</text>
+    <text x="548" y="65" fill="var(--accent)">skills</text>
+  </g>
+</svg>
+<figcaption>Orange is yours. The 46k on the left is never written to any transcript — it needs
+request instrumentation to measure, so ctx-guard reports it as unattributed rather than guessing.</figcaption>
+</figure>
+
+<h2>Install</h2>
+<pre><code>go install github.com/muthuishere/ctx-guard/cmd/ctxguard@latest</code></pre>
+<p>Or take a binary from <a href="https://github.com/muthuishere/ctx-guard/releases">releases</a>
+— macOS, Linux and Windows, x86_64 and arm64. No cgo, no runtime dependencies.
+Reading OpenCode and Devin sessions needs <code>sqlite3</code> on PATH; every other
+client works without it.</p>
+
+<h2>Use</h2>
+<pre><code>ctxguard report     # what the context is made of
+ctxguard status     # statusline (reads hook JSON on stdin)
+ctxguard doctor     # what is wired — and what we cannot see
+ctxguard install    # statusline + hooks for every detected client
+ctxguard uninstall  # restore every file from backup</code></pre>
+
+<h2>Clients</h2>
+<table>
+<thead><tr><th>client</th><th>measure</th><th>caveat</th></tr></thead>
+<tbody>
+<tr><td><strong>Claude Code</strong></td><td><code>message.usage</code></td><td>—</td></tr>
+<tr><td><strong>Codex</strong></td><td>rollout JSONL — gives <code>model_context_window</code> directly</td><td>hooks did <em>not</em> fire under <code>codex exec</code> across 4 runs</td></tr>
+<tr><td><strong>OpenCode</strong></td><td><code>message.data</code> in <code>opencode.db</code></td><td>no subprocess hooks — a JS plugin shim bridges it</td></tr>
+<tr><td><strong>Devin CLI</strong></td><td><code>metadata.metrics</code> inside <code>chat_message</code> JSON</td><td>hook path inferred from binary strings; opt-in</td></tr>
+</tbody>
+</table>
+
+<h2>Design rules</h2>
+<p>Each one comes from a real defect in the version this replaces.</p>
+<ul>
+<li><strong>Never resolve a path by convention.</strong> Take <code>transcript_path</code> and
+<code>session_id</code> from the harness; honour <code>CLAUDE_CONFIG_DIR</code>, <code>CODEX_HOME</code>,
+<code>OPENCODE_CONFIG_DIR</code>.</li>
+<li><strong>Never invent a context window.</strong> Unknown prints no percentage. The old
+version silently fell back to 200K whenever the newest transcript model was
+<code>&lt;synthetic&gt;</code> — and so fired its warnings at <strong>5× too low</strong>.</li>
+<li><strong>Act, don't advise.</strong> A guard costing 677 tokens a session to tell you to
+save tokens is a net loss.</li>
+<li><strong>Attribute only what is measurable.</strong> ~60% of the window is in no transcript.</li>
+<li><strong>Never rely on exit status.</strong> Codex fails <em>open</em> on a hook error;
+Copilot fails <em>closed</em>. Always emit an explicit decision object.</li>
+<li><strong>Be reversible.</strong> Overwritten files are backed up and restored; created files
+are deleted. A <code>settings.json</code> that does not parse is refused, not clobbered.</li>
+</ul>
+
+<pre><code>$ ctxguard install
+  claude    statusLine + UserPromptSubmit wired (replaced statusline: /my/old/statusline.sh)
+$ ctxguard uninstall
+  claude    restored ~/.claude/settings.json      ← byte-identical, old statusline back</code></pre>
+
+<hr class="rule">
+<footer>
+Numbers measured on one machine, 2026-06-12 → 2026-09-21. Your mix will differ; run
+<code>ctxguard report</code> and see.
+</footer>
+
+</div>
+</body>
+</html>
