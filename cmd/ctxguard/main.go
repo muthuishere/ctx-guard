@@ -11,6 +11,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"strings"
 
 	"github.com/muthuishere/ctx-guard/internal/adapter"
@@ -57,7 +58,7 @@ func main() {
 	case "uninstall":
 		err = cmdUninstall()
 	case "version", "--version", "-v":
-		fmt.Printf("ctxguard %s (%s, built %s)\n", version, commit, date)
+		fmt.Println(versionString())
 	case "help", "-h", "--help":
 		fmt.Print(usage)
 	default:
@@ -284,6 +285,31 @@ func cmdUninstall() error {
 		fmt.Println("  " + l)
 	}
 	return nil
+}
+
+// versionString prefers goreleaser's ldflags, and falls back to the module
+// version the Go toolchain records — otherwise a `go install ...@latest` build
+// reports itself as "dev", which is worse than useless in a bug report.
+func versionString() string {
+	v, c, d := version, commit, date
+	if v == "dev" {
+		if bi, ok := debug.ReadBuildInfo(); ok {
+			if bi.Main.Version != "" && bi.Main.Version != "(devel)" {
+				v = bi.Main.Version
+			}
+			for _, s := range bi.Settings {
+				switch s.Key {
+				case "vcs.revision":
+					if len(s.Value) >= 7 {
+						c = s.Value[:7]
+					}
+				case "vcs.time":
+					d = s.Value
+				}
+			}
+		}
+	}
+	return fmt.Sprintf("ctxguard %s (%s, built %s)", v, c, d)
 }
 
 func contains(args []string, s string) bool {
